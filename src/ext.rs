@@ -71,7 +71,7 @@ impl<R: Runtime> WindowExt for Window<R> {
       })
       .unwrap_or_default();
 
-    let physical_pos = match pos {
+    let mut physical_pos = match pos {
       TopLeft => *screen_position,
       TopRight => PhysicalPosition {
         x: screen_position.x + (screen_size.width - window_size.width),
@@ -172,7 +172,18 @@ impl<R: Runtime> WindowExt for Window<R> {
         }
       }
     };
-
+    if physical_pos.x < screen_position.x {
+      physical_pos.x = screen_position.x;
+    }
+    if physical_pos.x + window_size.width > screen_position.x + screen_size.width {
+      physical_pos.x = screen_position.x + (screen_size.width - window_size.width);
+    }
+    if physical_pos.y < screen_position.y {
+      physical_pos.y = screen_position.y;
+    }
+    if physical_pos.y + window_size.height > screen_position.y + screen_size.height {
+      physical_pos.y = screen_position.y + (screen_size.height - window_size.height);
+    }
     self.set_position(tauri::Position::Physical(physical_pos))
   }
 }
